@@ -1,0 +1,39 @@
+{
+    "orders": [
+        {
+            "item": "asasd",
+            "quantity": 2
+        },
+        {
+            "item": "jghj",
+            "quantity": 4,
+            "price": 3.0,
+            "buyer": "wfewqw"
+        },
+        {
+            "item": "jkhkshajfh",
+            "quantity": 789,
+            "price": 789.0,
+            "buyer": "lkhhajejzjvj"
+        },
+        {
+            "item": "\u043d\u043e\u0441\u043a\u0438",
+            "quantity": 2,
+            "price": 100.0,
+            "buyer": "\u042f"
+        },
+        {
+            "item": "jkhjnams",
+            "quantity": 23,
+            "price": 9000.0,
+            "buyer": "sjkajn,sa"
+        },
+        {
+            "item": "kjhkjhjkas",
+            "quantity": 1,
+            "price": 1000.0,
+            "buyer": "ljlkjlksd",
+            "date": "2000-02-02"
+        }
+    ]
+}
