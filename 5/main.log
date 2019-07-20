@@ -1,0 +1,10 @@
+2019-07-16 12:18:26,542 - INFO - Сервер запущен... localhost:8000
+2019-07-16 12:18:28,918 - INFO - Сервер выключен.
+2019-07-16 12:19:40,554 - INFO - Сервер запущен... localhost:8000
+2019-07-16 12:19:55,707 - INFO - Клиент подключился: 127.0.0.1:49222
+2019-07-16 12:20:04,699 - DEBUG - Controller echo resolved with request: {'action': 'echo', 'time': 1563268804.500468, 'data': '1234567890'}
+2019-07-16 12:20:11,835 - INFO - Сервер выключен.
+2019-07-16 12:22:21,498 - INFO - Сервер запущен... localhost:8000
+2019-07-16 12:22:25,005 - INFO - Клиент подключился: 127.0.0.1:49828
+2019-07-16 12:22:35,449 - DEBUG - Controller servererror resolved with request: {'action': 'servererror', 'time': 1563268955.365927, 'data': ''}
+2019-07-16 12:22:35,450 - CRITICAL - Controller servererror error: Server error message
