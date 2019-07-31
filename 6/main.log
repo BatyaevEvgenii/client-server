@@ -1,0 +1,8 @@
+2019-07-30 18:35:04,371 - INFO - Сервер запущен... localhost:8000
+2019-07-30 18:37:27,794 - INFO - Клиент подключился: 127.0.0.1:62888
+2019-07-30 18:37:42,805 - ERROR - Controller wwqqqwq not found
+2019-07-30 18:37:51,057 - INFO - Клиент подключился: 127.0.0.1:62982
+2019-07-30 18:38:01,358 - DEBUG - Controller echo resolved with request: {'action': 'echo', 'time': 1564501081.358485, 'data': 'efqewq'}
+2019-07-30 18:41:10,354 - INFO - Клиент подключился: 127.0.0.1:63777
+2019-07-30 18:41:17,880 - DEBUG - Controller echo resolved with request: {'action': 'echo', 'time': 1564501277.880496, 'data': 'start'}
+2019-07-31 14:45:07,599 - INFO - Сервер выключен.
