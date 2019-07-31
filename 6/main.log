@@ -6,3 +6,16 @@
 2019-07-30 18:41:10,354 - INFO - Клиент подключился: 127.0.0.1:63777
 2019-07-30 18:41:17,880 - DEBUG - Controller echo resolved with request: {'action': 'echo', 'time': 1564501277.880496, 'data': 'start'}
 2019-07-31 14:45:07,599 - INFO - Сервер выключен.
+2019-07-31 19:51:53,472 - INFO - Сервер запущен... localhost:8000
+2019-07-31 19:52:00,966 - INFO - Клиент подключился: 127.0.0.1:62542
+2019-07-31 19:52:07,228 - DEBUG - Controller echo resolved with request: {'action': 'echo', 'time': 1564591927.025678, 'data': 'test'}
+2019-07-31 19:52:07,228 - DEBUG - echo_controller: {'action': 'echo', 'time': 1564591927.025678, 'data': 'test'}
+2019-07-31 20:04:18,233 - INFO - Сервер выключен.
+2019-07-31 20:04:42,975 - INFO - Сервер запущен... localhost:8000
+2019-07-31 20:04:52,502 - INFO - Клиент подключился: 127.0.0.1:49234
+2019-07-31 20:05:10,788 - DEBUG - Controller servererror resolved with request: {'action': 'servererror', 'time': 1564592710.750906, 'data': 'test'}
+2019-07-31 20:10:14,637 - INFO - Сервер выключен.
+2019-07-31 20:10:20,276 - INFO - Сервер запущен... localhost:8000
+2019-07-31 20:10:25,041 - INFO - Клиент подключился: 127.0.0.1:50563
+2019-07-31 20:10:36,686 - DEBUG - Controller servererror resolved with request: {'action': 'servererror', 'time': 1564593036.576008, 'data': 'test', 'token': 'a9cc6ec387528dae0bfb8dc45e21121f70f493136258f0f626e2ff365575f535'}
+2019-07-31 20:10:36,686 - CRITICAL - Controller servererror error: Server error message
