@@ -1,4 +1,4 @@
-# server
+ # server
 # for connection
 from socket import socket
 
@@ -6,10 +6,13 @@ from socket import socket
 import yaml
 import json
 import logging
+import select
 from argparse import ArgumentParser
 
 # из нашего модуля protocol импортируем
 from protocol import validate_request, make_response
+
+from handlers import handle_default_request
 
 from resolvers import resolve
 
@@ -78,10 +81,20 @@ logging.basicConfig(
     ]
 )
 
+# коллекция хранения клиетских запросов
+requests = []
+
+# реализуем накомление клиентских подключений
+connections = []
 
 try:
     sock = socket()
     sock.bind((host, port))
+
+    # неблокирующий сервер, но setblocking хорош только не для windows
+    # sock.setblocking(False)
+    sock.settimeout(0)
+
     sock.listen(5) # слушаем 5 соединений клиентов
 
     ''' здесь и далее заменяем все ранее установленные print на logger.info'''
@@ -90,48 +103,54 @@ try:
 
     # ожидание клиентского подключения
     while True:
-        client, address = sock.accept()
-        logging.info(f'Клиент подключился: {address[0]}:{address[1]}')
-        # print(f'Клиент подключился: {address[0]}:{address[1]}')
-        byte_request = client.recv(default_config.get('buffersize'))
+        try:
+            client, address = sock.accept()
 
-        # в строку потом в словарь
-        request = json.loads(byte_request.decode())
+            # реализуем накомление клиентских подключений
+            connections.append(client)
 
-        # проходим валидацию
-        if validate_request(request):
-            action_name = request.get('action')
-            # извлекаем контроллер
-            controller = resolve(action_name)
-            # if action == 'echo':
-            if controller:
-                try:
-                    ''' фиксируем debug '''
-                    logging.debug(f'Controller {action_name} resolved with request: {request}')
-                    # print(f'Controller {action_name} resolved with request: {request}')
+            logging.info(f'Клиент подключился: {address[0]}:{address[1]} | Подключений: {connections}')
+            # print(f'Клиент подключился: {address[0]}:{address[1]}')
+        except :
+            pass
 
-                    response = controller(request)
-                except Exception as err:
-                    ''' фикусируем критическую ситуацию '''
-                    logging.critical(f'Controller {action_name} error: {err}')
-                    # print(f'Controller {action_name} error: {err}')
-                    response = make_response(request, 500, 'Internal server error')
-            else:
-                ''' фиксируем симантические ошибки '''
-                logging.error(f'Controller {action_name} not found')
-                # print(f'Controller {action_name} not found')
-                response = make_response(request, 404, f'Action with name "{action_name}"   not supported')
-        else:
-            ''' фиксируем симантические ошибки '''
-            logging.error(f'Controller wrong request: {request}')
-            # print(f'Controller wrong request: {request}')
-            response = make_response(request, 400, 'Wrong request format!')
-
-        client.send(
-            json.dumps(response).encode()
+        # определение типа подключения
+        rlist, wlist, xlist = select.select(
+            connections, connections, connections, 0
         )
 
-        client.close()
+
+        # алгоритм обработки запросов
+        for r_client in rlist:
+            byte_request = r_client.recv(default_config.get('buffersize'))
+            requests.append(byte_request)
+
+        # отправка сообщений
+        if requests:
+            byte_request = requests.pop()
+            byte_response = handle_default_request(byte_request)
+
+            for w_client in wlist:
+                w_client.send(byte_response)
+
+
+
+
+        '''
+        переносим вырезанную часть кода в handlers.py и 
+        вызовем ее ниже
+        '''
+
+        ''' удялем то что ниже так как это использовалось в блокирующем сервере'''
+        # byte_request = client.recv(default_config.get('buffersize'))
+
+        # byte_response = handle_default_request(byte_request)
+
+        # client.send(json.dumps(response).encode())
+        # client.send(byte_response)
+
+        # не разрываем соединение с клиентом
+        # client.close()
         # print(f'Клиент отключился...')
 
     # обработаем исключение
@@ -150,5 +169,6 @@ python server -c config.yaml
 fab server
 fab client
 fab kill
+fab client:w
 '''
 
