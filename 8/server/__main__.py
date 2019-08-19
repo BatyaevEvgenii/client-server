@@ -7,6 +7,7 @@ import yaml
 import json
 import logging
 import select
+import threading
 from argparse import ArgumentParser
 
 # из нашего модуля protocol импортируем
@@ -15,6 +16,22 @@ from protocol import validate_request, make_response
 from handlers import handle_default_request
 
 from resolvers import resolve
+
+
+def read(sock, connections, requests, buffersize):
+    try:
+        bytes_request = sock.recv(buffersize)
+    except Exception:
+        connections.remove(sock)
+    else:
+        if bytes_request:
+            requests.append(bytes_request)
+
+def write(sock, connections, response):
+    try:
+        sock.send(response)
+    except Exception:
+        connections.remove(sock)
 
 # конструктор объекта
 parser = ArgumentParser()
@@ -122,8 +139,11 @@ try:
 
         # алгоритм обработки запросов
         for r_client in rlist:
-            byte_request = r_client.recv(default_config.get('buffersize'))
-            requests.append(byte_request)
+            # расспаралеливаем чтение
+            r_thread = threading.Thread(target=read, args=(r_client, connections, requests, default_config.get('buffersize')))
+            # byte_request = r_client.recv(default_config.get('buffersize'))
+            # requests.append(byte_request)
+            r_thread.start()
 
         # отправка сообщений
         if requests:
@@ -131,7 +151,10 @@ try:
             byte_response = handle_default_request(byte_request)
 
             for w_client in wlist:
-                w_client.send(byte_response)
+                w_thread = threading.Thread(target=write,
+                                            args=(w_client, connections, byte_response))
+                w_thread.start()
+                # w_client.send(byte_response)
 
 
 

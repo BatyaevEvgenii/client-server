@@ -1,12 +1,28 @@
-# client
+ # client
 # обработка командной строки
 import zlib
 import yaml
 import json
 import hashlib
+import threading
 from datetime import datetime
 from socket import socket
 from argparse import ArgumentParser
+
+def read(sock, buffersize):
+    while True:
+        # byte_response = sock.recv(default_config.get('buffersize'))
+        # compressed_response = sock.recv(default_config.get('buffersize'))
+        compressed_response = sock.recv(buffersize)
+
+        # print(compressed_response)
+
+        byte_response = zlib.decompress(compressed_response)
+
+        print(f'{byte_response.decode()}')
+
+
+
 
 # конструктор объекта
 parser = ArgumentParser()
@@ -20,12 +36,14 @@ parser.add_argument(
     required=False, help='установки пути конфига'
 )
 
-
+'''
+убираем этот метод так как распарралелим работу и клиент будет работать в двух режимах сразу
+'''
 # выбор режима чтения/записи
-parser.add_argument(
-    '-m', '--mode', type=str, default='r',
-    required=False, help='выбор режима чтения/записи'
-)
+# parser.add_argument(
+#     '-m', '--mode', type=str, default='r',
+#     required=False, help='выбор режима чтения/записи'
+# )
 
 
 # if __name__ == '__main__': можем убрать после того как файл переименовали в __main__,
@@ -53,50 +71,6 @@ if args.config:
         default_config.update(file_config)
 
 
-def write(sock):
-    # генерация хэша
-    hash_obj = hashlib.sha256()
-    hash_obj.update(
-        str(datetime.now().timestamp()).encode()
-    )
-
-    action = input('Введите действие: ')
-    data = input('Введите данные: ')
-
-    # запрос клиента
-    # сгенерирует токен на основе timestamp
-    request = {
-        'action': action,
-        # timestamp поможет нам с отображением даты в дальнейшем
-        'time': datetime.now().timestamp(),
-        'data': data,
-        'token': hash_obj.hexdigest()
-    }
-
-    # строковое представление запроса
-    string_request = json.dumps(request)
-
-    byte_request = zlib.compress(string_request.encode())
-
-    # print(byte_request)
-
-    # формируем байтовую последовательность
-    # sock.send(string_request.encode())
-    sock.send(byte_request)
-    print(f'Клиент отправил данные: {data}')
-
-
-def read(sock):
-    # byte_response = sock.recv(default_config.get('buffersize'))
-    compressed_response = sock.recv(default_config.get('buffersize'))
-
-    # print(compressed_response)
-
-    byte_response = zlib.decompress(compressed_response)
-
-    print(f'{byte_response.decode()}')
-
-
 
 sock = socket()
 sock.connect(
@@ -108,12 +82,47 @@ print(f'Клиент запущен... ')
 
 # бесконечный цикл, пока клиент не уйдет сам
 try:
+    read_thread = threading.Thread(target=read, args=(sock, default_config.get('buffersize')))
+    read_thread.start()
     while True:
-        if args.mode == 'w':
-            write(sock)
+        # if args.mode == 'w':
+        #     write(sock)
+        #
+        # elif args.mode == 'r':
+        #     read(sock)
 
-        elif args.mode == 'r':
-            read(sock)
+        # генерация хэша
+        hash_obj = hashlib.sha256()
+        hash_obj.update(
+            str(datetime.now().timestamp()).encode()
+        )
+
+        action = input('Введите действие: ')
+        data = input('Введите данные: ')
+
+        # запрос клиента
+        # сгенерирует токен на основе timestamp
+        request = {
+            'action': action,
+            # timestamp поможет нам с отображением даты в дальнейшем
+            'time': datetime.now().timestamp(),
+            'data': data,
+            'token': hash_obj.hexdigest()
+        }
+
+        # строковое представление запроса
+        string_request = json.dumps(request)
+
+        byte_request = zlib.compress(string_request.encode())
+
+        # print(byte_request)
+
+        # формируем байтовую последовательность
+        # sock.send(string_request.encode())
+        sock.send(byte_request)
+        print(f'Клиент отправил данные: {data}')
+
+
 except KeyboardInterrupt:
     sock.close()
     print('Клиент вышел...')
